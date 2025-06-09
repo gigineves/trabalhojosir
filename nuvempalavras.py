@@ -1,4 +1,4 @@
-pip install pytube youtube-transcript-api wordcloud matplotlib
+
 
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from wordcloud import WordCloud
