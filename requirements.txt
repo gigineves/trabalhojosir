@@ -1,1 +1,5 @@
-pip install pytube youtube-transcript-api wordcloud matplotlib
+pytube
+youtube-transcript-api
+wordcloud
+matplotlib
+
