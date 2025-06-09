@@ -34,18 +34,20 @@ def generate_wordcloud(text):
     plt.show()
 
 def main():
-    url = st.text_input("Cole a URL do YouTube Shorts: ")
-    try:
-        video_id = extract_video_id(url)
-        print(f"[+] Extraindo legendas do vídeo ID: {video_id}")
-        text = get_captions(video_id)
-        if text:
-            print("[+] Legendas encontradas. Gerando nuvem de palavras...")
-            generate_wordcloud(text)
-        else:
-            print("[-] Não foi possível obter legendas para esse vídeo.")
-    except Exception as e:
-        print(f"Erro: {e}")
+   url = st.text_input("Cole a URL do YouTube Shorts: ")
+
+   if url:
+       try:
+           video_id = extract_video_id(url)
+           print(f"[+] Extraindo legendas do vídeo ID: {video_id}")
+           text = get_captions(video_id)
+           if text:
+               print("[+] Legendas encontradas. Gerando nuvem de palavras...")
+               generate_wordcloud(text)
+           else:
+               print("[-] Não foi possível obter legendas para esse vídeo.")
+       except Exception as e:
+           print(f"Erro: {e}")
 
 if __name__ == "__main__":
     main()
