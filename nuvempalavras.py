@@ -34,7 +34,7 @@ def generate_wordcloud(text):
     plt.show()
 
 def main():
-    url = input("Cole a URL do YouTube Shorts: ").strip()
+    url = st.text_input("Cole a URL do YouTube Shorts: ")
     try:
         video_id = extract_video_id(url)
         print(f"[+] Extraindo legendas do vídeo ID: {video_id}")
