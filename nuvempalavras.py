@@ -36,7 +36,7 @@ def main():
     st.title("Gerador de Nuvem de Palavras para YouTube Shorts")
     st.write("Cole a URL de um YouTube Short (ou vídeo normal) e veja a nuvem de palavras das legendas!")
     url = st.text_input("Cole a URL do YouTube Shorts: ")
-print('main()')
+    print('main()')
     if url:
        try:
             video_id = extract_video_id(url)
