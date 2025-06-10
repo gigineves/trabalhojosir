@@ -16,7 +16,7 @@ def extract_video_id(url):
     if match:
         return match.group(1)
     raise ValueError("ID do vídeo não encontrado na URL")
-
+print ('extract_video_id(url)')
 def get_captions(video_id):
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['pt', 'en'])
@@ -24,7 +24,7 @@ def get_captions(video_id):
         return full_text
     except (TranscriptsDisabled, NoTranscriptFound):
         return None
-
+print( 'get_captions(video_id)')
 def generate_wordcloud(text):
     wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
     plt.figure(figsize=(10, 5))
@@ -32,7 +32,7 @@ def generate_wordcloud(text):
     plt.axis('off')
     plt.tight_layout()
     plt.show()
-
+print('generate_wordcloud(text)')
 def main():
    url = st.text_input("Cole a URL do YouTube Shorts: ")
 
