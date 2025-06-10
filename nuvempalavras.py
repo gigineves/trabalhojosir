@@ -35,7 +35,7 @@ def generate_wordcloud(text):
 print('generate_wordcloud(text)')
 def main():
    url = st.text_input("Cole a URL do YouTube Shorts: ")
-
+print('main()')
    if url:
        try:
            video_id = extract_video_id(url)
