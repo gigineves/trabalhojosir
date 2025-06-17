@@ -3,16 +3,16 @@ from googleapiclient.discovery import build
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import re
-from nltk.corpus import stopwords
 import nltk
+from nltk.corpus import stopwords
 
-# Baixa stopwords (palavras irrelevantes como "o", "de", etc.)
+# Configuração do NLTK (baixa stopwords se necessário)
 nltk.download('stopwords')
+nltk.download('punkt')
+
+# Stopwords em português e inglês
 stop_words_pt = set(stopwords.words('portuguese'))
 stop_words_en = set(stopwords.words('english'))
-
-# Configuração da API
-YOUTUBE_API_KEY = st.secrets.get("YOUTUBE_API_KEY")  # Chave no secrets.toml
 
 # --- Funções ---
 def extract_video_id(url):
@@ -20,10 +20,10 @@ def extract_video_id(url):
     match = re.search(r"(?:v=|\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})", url)
     return match.group(1) if match else None
 
-def get_video_comments(video_id, max_results=100):
+def get_video_comments(video_id, api_key, max_results=100):
     """Busca comentários usando a API v3."""
     try:
-        youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+        youtube = build('youtube', 'v3', developerKey=api_key)
         request = youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
@@ -31,26 +31,10 @@ def get_video_comments(video_id, max_results=100):
             textFormat="plainText"
         )
         response = request.execute()
-        
-        comments = []
-        for item in response.get('items', []):
-            comment = item['snippet']['topLevelComment']['snippet']
-            comments.append(comment['textDisplay'])
-        
-        return " ".join(comments)  # Junta todos os comentários em um único texto
-    
+        return " ".join([item['snippet']['topLevelComment']['snippet']['textDisplay'] for item in response.get('items', [])])
     except Exception as e:
         st.error(f"Erro ao buscar comentários: {e}")
         return None
-
-def clean_text(text):
-    """Remove stopwords, links e caracteres especiais."""
-    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)  # Remove URLs
-    text = re.sub(r'\W', ' ', text)  # Remove caracteres não alfanuméricos
-    text = text.lower()  # Converte para minúsculas
-    # Remove stopwords em português e inglês
-    text = " ".join([word for word in text.split() if word not in stop_words_pt and word not in stop_words_en])
-    return text
 
 def generate_wordcloud(text):
     """Gera a nuvem de palavras."""
@@ -58,52 +42,36 @@ def generate_wordcloud(text):
         width=800,
         height=400,
         background_color='white',
-        collocations=False,  # Evita repetições
-        stopwords=stop_words_pt.union(stop_words_en)  # Filtra stopwords adicionais
+        stopwords=stop_words_pt.union(stop_words_en)
     ).generate(text)
-    
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots()
     ax.imshow(wordcloud, interpolation='bilinear')
-    ax.axis('off')
+    ax.axis("off")
     return fig
 
 # --- Interface Streamlit ---
 st.set_page_config(page_title="Nuvem de Comentários do YouTube", layout="wide")
-st.title("☁️ Nuvem de Palavras de Comentários do YouTube")
+st.title("☁️ Nuvem de Palavras - Comentários do YouTube")
 
-url = st.text_input("Cole a URL do vídeo:", placeholder="Ex: https://www.youtube.com/watch?v=...")
+api_key = st.secrets.get("YOUTUBE_API_KEY", "")
+url = st.text_input("Cole a URL do vídeo do YouTube:")
 max_comments = st.slider("Número máximo de comentários:", 10, 200, 50)
 
-if url:
+if url and api_key:
     video_id = extract_video_id(url)
     if video_id:
-        st.write(f"🔍 Analisando vídeo: `{video_id}`")
-        
         if st.button("Gerar Nuvem de Palavras"):
             with st.spinner("Buscando comentários..."):
-                comments_text = get_video_comments(video_id, max_results=max_comments)
-            
+                comments_text = get_video_comments(video_id, api_key, max_comments)
             if comments_text:
-                with st.spinner("Processando texto..."):
-                    cleaned_text = clean_text(comments_text)
-                    fig = generate_wordcloud(cleaned_text)
-                
-                st.success("Nuvem de palavras gerada!")
-                st.pyplot(fig)
-                
-                # Opcional: Mostrar estatísticas
-                st.subheader("📊 Estatísticas")
-                col1, col2 = st.columns(2)
-                col1.metric("Total de comentários", max_comments)
-                col2.metric("Palavras únicas", len(set(cleaned_text.split())))
-                
-                # Opcional: Mostrar comentários brutos (expandível)
-                with st.expander("Ver comentários originais"):
-                    st.text(comments_text[:5000] + "...")  # Limita a exibição
+                with st.spinner("Criando nuvem de palavras..."):
+                    st.pyplot(generate_wordcloud(comments_text))
             else:
-                st.warning("Nenhum comentário encontrado ou vídeo sem permissão.")
+                st.warning("Nenhum comentário encontrado.")
     else:
-        st.error("URL inválida. Exemplo válido: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        st.error("URL inválida.")
+elif not api_key:
+    st.error("Chave da API do YouTube não configurada.")
 
 
       
