@@ -6,15 +6,12 @@ import re
 import nltk
 from nltk.corpus import stopwords
 
-# Configuração do NLTK (baixa stopwords se necessário)
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Stopwords em português e inglês
 stop_words_pt = set(stopwords.words('portuguese'))
 stop_words_en = set(stopwords.words('english'))
 
-# --- Funções ---
 def extract_video_id(url):
     """Extrai o ID do vídeo da URL."""
     match = re.search(r"(?:v=|\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})", url)
@@ -49,7 +46,6 @@ def generate_wordcloud(text):
     ax.axis("off")
     return fig
 
-# --- Interface Streamlit ---
 st.set_page_config(page_title="Nuvem de Comentários do YouTube", layout="wide")
 st.title("☁️ Nuvem de Palavras - Comentários do YouTube")
 
