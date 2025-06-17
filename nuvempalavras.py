@@ -11,7 +11,7 @@ from googleapiclient.discovery import build
 # Crie um arquivo .streamlit/secrets.toml e adicione sua chave lá.
 # Exemplo de .streamlit/secrets.toml:
 # YOUTUBE_API_KEY = "SUA_CHAVE_DE_API_AQUI"
-YOUTUBE_API_KEY = st.secrets["AIzaSyDUYBTIuUDKZWA7UL_il8IDwtC1_N4tNJQ"]
+YOUTUBE_API_KEY = st.secrets["YOUTUBE_API_KEY"]
 
 def extract_video_id(url):
     """Extrai o ID do vídeo de uma URL do YouTube."""
